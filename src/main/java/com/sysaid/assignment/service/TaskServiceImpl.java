@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 @Service
-public class TaskServiceImpl implements  ITaskService{
+public class TaskServiceImpl implements ITaskService {
 
     @Value("${external.boredapi.baseURL}")
     private String baseUrl;
