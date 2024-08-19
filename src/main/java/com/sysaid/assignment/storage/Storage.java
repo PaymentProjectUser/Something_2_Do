@@ -22,19 +22,7 @@ public class Storage {
         return instance;
     }
 
-    public void addTask(Task task, UserData userData) {
-        taskMap.put(task, userData);
-    }
-
-    public UserData getUserDataByTask(Task task) {
-        return taskMap.get(task);
-    }
-
-    public void removeTask(Task task) {
-        taskMap.remove(task);
-    }
-
-    public boolean containsTask(Task task) {
-        return taskMap.containsKey(task);
+    public Map<Task, UserData> getTaskMap() {
+        return taskMap;
     }
 }

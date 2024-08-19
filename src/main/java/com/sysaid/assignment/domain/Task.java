@@ -1,12 +1,14 @@
 package com.sysaid.assignment.domain;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.io.Serializable;
 
 @Getter
 @Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Task implements Serializable {
 
 	private static final long serialVersionUID = 1L;
