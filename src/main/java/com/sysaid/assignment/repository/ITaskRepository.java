@@ -9,6 +9,8 @@ import java.util.List;
 public interface ITaskRepository {
     List<Task> getUncompletedTasks(String user, String type);
 
+    Task completeTask(CompleteRequestTaskDto completeRequestTaskDto);
+
     Task createTask(Task task, String username);
 
     Task updateTask(Task updatedTask, String taskKey);
@@ -16,8 +18,6 @@ public interface ITaskRepository {
     Task getTask(GetRequestTaskDto getRequestTaskDto);
 
     Task deleteTask(DeleteRequestTaskDto deleteRequestTaskDto);
-
-    Task completeTask(CompleteRequestTaskDto completeRequestTaskDto);
 
     List<Task> getCompletedTasks(String username);
 

@@ -1,6 +1,5 @@
 package com.sysaid.assignment.dto;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,14 +7,12 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class CreateRequestTaskDto {
+public class GetRequestUncompletedTaskDto {
     private String activity;
     private Float accessibility;
     private String type;
     private Integer participants;
     private Float price;
     private String link;
-    @NotNull
     private String key;
-    private String username;
 }

@@ -23,25 +23,30 @@ public class TaskServiceImpl implements ITaskService {
     private final TaskMapper taskMapper;
 
     @Override
-    public ResponseEntity<Task[]> getUncompletedTasks(String user, String type) {
-        List<Task> uncompletedTasks = ITaskRepository.getUncompletedTasks(user, type);
-        Task[] taskArray = uncompletedTasks.toArray(Task[]::new);
-        return ResponseEntity.ok(taskArray);
+    public ResponseEntity<GetRequestUncompletedTaskDto[]> getUncompletedTasks(String user, String type) {
+        return ResponseEntity.ok(
+                ITaskRepository.getUncompletedTasks(user, type).stream()
+                        .map(taskMapper::taskToGetRequestUncompletedTaskDto)
+                        .toArray(GetRequestUncompletedTaskDto[]::new)
+        );
     }
 
     @Override
-    public ResponseEntity<Task[]> getCompletedTasks(String user) {
-        List<Task> uncompletedTasks = ITaskRepository.getCompletedTasks(user);
-        Task[] taskArray = uncompletedTasks.toArray(Task[]::new);
-        return ResponseEntity.ok(taskArray);
+    public ResponseEntity<GetRequestСompletedTaskDto[]> getCompletedTasks(String user) {
+        return ResponseEntity.ok(
+                ITaskRepository.getCompletedTasks(user).stream()
+                        .map(taskMapper::taskToGetRequestCompletedTaskDto)
+                        .toArray(GetRequestСompletedTaskDto[]::new)
+        );
     }
 
     public ResponseEntity<Task> getRandomTask() {
-        String endpointUrl = "https://www.boredapi.com/activity"; //String.format("%s/activity", baseUrl);
+        String endpointUrl = String.format("%s/activity", baseUrl);
 
         RestTemplate template = new RestTemplate();
         ResponseEntity<Task> responseEntity = template.getForEntity(endpointUrl, Task.class);
 
+        ITaskRepository.createTask(responseEntity.getBody(), null);
         return responseEntity;
     }
 
@@ -61,36 +66,38 @@ public class TaskServiceImpl implements ITaskService {
     }
 
     @Override
-    public ResponseEntity<Task> createTask(CreateRequestTaskDto createRequestTaskDto) {
+    public ResponseEntity<CreateResponseTaskDto> createTask(CreateRequestTaskDto createRequestTaskDto) {
         Task createdTask = ITaskRepository.createTask(taskMapper.mapCreateRequestTaskDtoToTask(createRequestTaskDto),
                 createRequestTaskDto.getUsername());
-        return ResponseEntity.ok(createdTask);
+
+        return ResponseEntity.ok(taskMapper.taskToCreateTaskDto(createdTask));
     }
 
     @Override
-    public ResponseEntity<Task> updateTask(UpdateRequestTaskDto updateTaskDto) {
+    public ResponseEntity<UpdateResponseTaskDto> updateTask(UpdateRequestTaskDto updateTaskDto) {
         Task updatedTask = ITaskRepository.updateTask(taskMapper.updateUpdateRequestTaskDtoToTask(updateTaskDto),
                 updateTaskDto.getKey());
-        return ResponseEntity.ok(updatedTask);
+        return ResponseEntity.ok(taskMapper.taskToUpdateTaskDto(updatedTask));
     }
 
     @Override
-    public ResponseEntity<Task> getTask(GetRequestTaskDto getRequestTaskDto) {
+    public ResponseEntity<GetResponseTaskDto> getTask(GetRequestTaskDto getRequestTaskDto) {
         Task task = ITaskRepository.getTask(getRequestTaskDto);
-        return ResponseEntity.ok(task);
+        return ResponseEntity.ok(taskMapper.taskToGetResponseTaskDto(task));
     }
 
     @Override
-    public ResponseEntity<Task> deleteTask(DeleteRequestTaskDto deleteRequestTaskDto) {
+    public ResponseEntity<DeleteResponseTaskDto> deleteTask(DeleteRequestTaskDto deleteRequestTaskDto) {
         Task task = ITaskRepository.deleteTask(deleteRequestTaskDto);
-        return ResponseEntity.ok(task);
+        return ResponseEntity.ok(taskMapper.taskToDeleteTaskDto(task));
     }
 
     @Override
-    public ResponseEntity<Task[]> getUserWishList(GetRequestUserWishListDto getRequestUserWishListDto) {
-        List<Task> userWishList = ITaskRepository.getUserWishList(getRequestUserWishListDto.getUsername());
-
-        Task[] taskArray = userWishList.toArray(Task[]::new);
-        return ResponseEntity.ok(taskArray);
+    public ResponseEntity<GetRequestUserWishListTaskDto[]> getUserWishList(String username) {
+        return ResponseEntity.ok(
+                ITaskRepository.getUserWishList(username).stream()
+                        .map(taskMapper::taskToGetRequestUserWishListTaskDto)
+                        .toArray(GetRequestUserWishListTaskDto[]::new)
+        );
     }
 }
