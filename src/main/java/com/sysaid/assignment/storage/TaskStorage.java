@@ -6,18 +6,18 @@ import com.sysaid.assignment.domain.UserData;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Storage {
-    private static Storage instance;
+public class TaskStorage {
+    private static TaskStorage instance;
 
     private final Map<Task, UserData> taskMap;
 
-    private Storage() {
+    private TaskStorage() {
         taskMap = new HashMap<>();
     }
 
-    public static synchronized Storage getInstance() {
+    public static synchronized TaskStorage getInstance() {
         if (instance == null) {
-            instance = new Storage();
+            instance = new TaskStorage();
         }
         return instance;
     }

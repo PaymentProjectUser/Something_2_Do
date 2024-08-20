@@ -10,10 +10,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@AllArgsConstructor
+/*@AllArgsConstructor*/
 public class TaskController {
 
 	private final TaskServiceImpl taskService;
+
+    public TaskController(TaskServiceImpl taskService) {
+        this.taskService = taskService;
+    }
 
     /**
 	 * will return uncompleted tasks for given user
