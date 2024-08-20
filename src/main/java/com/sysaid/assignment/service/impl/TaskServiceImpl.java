@@ -11,8 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 public class TaskServiceImpl implements ITaskService {
@@ -40,29 +38,30 @@ public class TaskServiceImpl implements ITaskService {
         );
     }
 
-    public ResponseEntity<Task> getRandomTask() {
+    public ResponseEntity<CreateResponseTaskDto> getRandomTask() {
         String endpointUrl = String.format("%s/activity", baseUrl);
 
         RestTemplate template = new RestTemplate();
         ResponseEntity<Task> responseEntity = template.getForEntity(endpointUrl, Task.class);
 
-        ITaskRepository.createTask(responseEntity.getBody(), null);
-        return responseEntity;
+        return ResponseEntity.ok(taskMapper.taskToCreateTaskDto(
+                ITaskRepository.createTask(responseEntity.getBody(), null)));
     }
 
     @Override
-    public ResponseEntity<Task> completeTask(CompleteRequestTaskDto completeRequestTaskDto) {
+    public ResponseEntity<CompleteResponseTaskDto> completeTask(CompleteRequestTaskDto completeRequestTaskDto) {
         Task task =  ITaskRepository.completeTask(completeRequestTaskDto);
-        return ResponseEntity.ok(task);
+        return ResponseEntity.ok(taskMapper.taskToCompleteTaskDto(task));
     }
 
     @Override
-    public ResponseEntity<Task[]> addTaskToUserWishList(AddRequestTaskToUserWishListDto addRequestTaskToUserWishListDto) {
-        List<Task> userWishList =  ITaskRepository.addTaskToUserWishList(addRequestTaskToUserWishListDto.getUsername(),
-                addRequestTaskToUserWishListDto.getExistTaskDto());
-
-        Task[] taskArray = userWishList.toArray(Task[]::new);
-        return ResponseEntity.ok(taskArray);
+    public ResponseEntity<GetRequestUserWishListTaskDto[]> addTaskToUserWishList(AddRequestTaskToUserWishListDto addRequestTaskToUserWishListDto) {
+        return ResponseEntity.ok(
+                ITaskRepository.addTaskToUserWishList(addRequestTaskToUserWishListDto.getUsername(),
+                addRequestTaskToUserWishListDto.getExistTaskDto()).stream()
+                        .map(taskMapper::taskToGetRequestUserWishListTaskDto)
+                        .toArray(GetRequestUserWishListTaskDto[]::new)
+                );
     }
 
     @Override

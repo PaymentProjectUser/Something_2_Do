@@ -27,7 +27,7 @@ public class TaskController {
 	}
 
 	@GetMapping("/task-of-the-day")
-	public  ResponseEntity<Task> getTaskOfTheDay(){
+	public  ResponseEntity<CreateResponseTaskDto> getTaskOfTheDay(){
 		return taskService.getRandomTask();
 	}
 
@@ -57,12 +57,12 @@ public class TaskController {
 	}
 
 	@PostMapping("/complete")
-	public ResponseEntity<Task> completeTask(@RequestBody CompleteRequestTaskDto completeRequestTaskDto) {
+	public ResponseEntity<CompleteResponseTaskDto> completeTask(@RequestBody CompleteRequestTaskDto completeRequestTaskDto) {
 		return taskService.completeTask(completeRequestTaskDto);
 	}
 
 	@PostMapping("/add-to-wishlist")
-	public ResponseEntity<Task[]> addTaskToUserWishList(@RequestBody AddRequestTaskToUserWishListDto addRequestTaskToUserWishListDto) {
+	public ResponseEntity<GetRequestUserWishListTaskDto[]> addTaskToUserWishList(@RequestBody AddRequestTaskToUserWishListDto addRequestTaskToUserWishListDto) {
 		return taskService.addTaskToUserWishList(addRequestTaskToUserWishListDto);
 	}
 }

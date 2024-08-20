@@ -9,7 +9,7 @@ public interface ITaskService {
 
     ResponseEntity<GetRequestСompletedTaskDto[]> getCompletedTasks(String user);
 
-    ResponseEntity<Task> getRandomTask();
+    ResponseEntity<CreateResponseTaskDto> getRandomTask();
 
     ResponseEntity<CreateResponseTaskDto> createTask(CreateRequestTaskDto createRequestTaskDto);
 
@@ -21,7 +21,7 @@ public interface ITaskService {
 
     ResponseEntity<GetRequestUserWishListTaskDto[]> getUserWishList(String username);
 
-    ResponseEntity<Task> completeTask(CompleteRequestTaskDto completeRequestTaskDto);
+    ResponseEntity<CompleteResponseTaskDto> completeTask(CompleteRequestTaskDto completeRequestTaskDto);
 
-    ResponseEntity<Task[]> addTaskToUserWishList(AddRequestTaskToUserWishListDto addRequestTaskToUserWishListDto);
+    ResponseEntity<GetRequestUserWishListTaskDto[]> addTaskToUserWishList(AddRequestTaskToUserWishListDto addRequestTaskToUserWishListDto);
 }

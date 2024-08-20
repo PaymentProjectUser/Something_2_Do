@@ -23,4 +23,6 @@ public interface TaskMapper {
     DeleteResponseTaskDto taskToDeleteTaskDto(Task task);
 
     GetRequestUserWishListTaskDto taskToGetRequestUserWishListTaskDto(Task task);
+
+    CompleteResponseTaskDto taskToCompleteTaskDto(Task task);
 }
