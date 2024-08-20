@@ -1,14 +1,10 @@
 package com.sysaid.assignment.service.impl;
 
 import com.sysaid.assignment.domain.Task;
-import com.sysaid.assignment.dto.CreateRequestTaskDto;
-import com.sysaid.assignment.dto.DeleteRequestTaskDto;
-import com.sysaid.assignment.dto.GetRequestTaskDto;
-import com.sysaid.assignment.dto.UpdateRequestTaskDto;
+import com.sysaid.assignment.dto.*;
 import com.sysaid.assignment.mapper.TaskMapper;
-import com.sysaid.assignment.repository.TaskRepository;
+import com.sysaid.assignment.repository.ITaskRepository;
 import com.sysaid.assignment.service.ITaskService;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -18,18 +14,24 @@ import org.springframework.web.client.RestTemplate;
 import java.util.List;
 
 @Service
-@AllArgsConstructor
 @RequiredArgsConstructor
 public class TaskServiceImpl implements ITaskService {
     @Value("${external.boredapi.baseURL}")
     private String baseUrl;
 
-    private final TaskRepository taskRepository;
+    private final ITaskRepository ITaskRepository;
     private final TaskMapper taskMapper;
 
     @Override
     public ResponseEntity<Task[]> getUncompletedTasks(String user, String type) {
-        List<Task> uncompletedTasks = taskRepository.getUncompletedTasks(user, type);
+        List<Task> uncompletedTasks = ITaskRepository.getUncompletedTasks(user, type);
+        Task[] taskArray = uncompletedTasks.toArray(Task[]::new);
+        return ResponseEntity.ok(taskArray);
+    }
+
+    @Override
+    public ResponseEntity<Task[]> getCompletedTasks(String user) {
+        List<Task> uncompletedTasks = ITaskRepository.getCompletedTasks(user);
         Task[] taskArray = uncompletedTasks.toArray(Task[]::new);
         return ResponseEntity.ok(taskArray);
     }
@@ -44,35 +46,51 @@ public class TaskServiceImpl implements ITaskService {
     }
 
     @Override
-    public void completeTask() {
-
+    public ResponseEntity<Task> completeTask(CompleteRequestTaskDto completeRequestTaskDto) {
+        Task task =  ITaskRepository.completeTask(completeRequestTaskDto);
+        return ResponseEntity.ok(task);
     }
 
     @Override
-    public void addTaskToUserWishList() {
+    public ResponseEntity<Task[]> addTaskToUserWishList(AddRequestTaskToUserWishListDto addRequestTaskToUserWishListDto) {
+        List<Task> userWishList =  ITaskRepository.addTaskToUserWishList(addRequestTaskToUserWishListDto.getUsername(),
+                addRequestTaskToUserWishListDto.getExistTaskDto());
 
+        Task[] taskArray = userWishList.toArray(Task[]::new);
+        return ResponseEntity.ok(taskArray);
     }
 
     @Override
     public ResponseEntity<Task> createTask(CreateRequestTaskDto createRequestTaskDto) {
-        Task createdTask = taskRepository.createTask(createRequestTaskDto);
+        Task createdTask = ITaskRepository.createTask(taskMapper.mapCreateRequestTaskDtoToTask(createRequestTaskDto),
+                createRequestTaskDto.getUsername());
         return ResponseEntity.ok(createdTask);
     }
 
     @Override
     public ResponseEntity<Task> updateTask(UpdateRequestTaskDto updateTaskDto) {
-        return null;
+        Task updatedTask = ITaskRepository.updateTask(taskMapper.updateUpdateRequestTaskDtoToTask(updateTaskDto),
+                updateTaskDto.getKey());
+        return ResponseEntity.ok(updatedTask);
     }
 
     @Override
     public ResponseEntity<Task> getTask(GetRequestTaskDto getRequestTaskDto) {
-        Task task = taskRepository.getTask(getRequestTaskDto);
+        Task task = ITaskRepository.getTask(getRequestTaskDto);
         return ResponseEntity.ok(task);
     }
 
     @Override
     public ResponseEntity<Task> deleteTask(DeleteRequestTaskDto deleteRequestTaskDto) {
-        Task task = taskRepository.deleteTask(deleteRequestTaskDto);
+        Task task = ITaskRepository.deleteTask(deleteRequestTaskDto);
         return ResponseEntity.ok(task);
+    }
+
+    @Override
+    public ResponseEntity<Task[]> getUserWishList(GetRequestUserWishListDto getRequestUserWishListDto) {
+        List<Task> userWishList = ITaskRepository.getUserWishList(getRequestUserWishListDto.getUsername());
+
+        Task[] taskArray = userWishList.toArray(Task[]::new);
+        return ResponseEntity.ok(taskArray);
     }
 }

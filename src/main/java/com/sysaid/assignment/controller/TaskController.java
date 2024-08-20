@@ -1,6 +1,7 @@
 package com.sysaid.assignment.controller;
 
 import com.sysaid.assignment.domain.Task;
+import com.sysaid.assignment.service.ITaskService;
 import com.sysaid.assignment.service.impl.TaskServiceImpl;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -10,14 +11,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-/*@AllArgsConstructor*/
+@AllArgsConstructor
 public class TaskController {
 
-	private final TaskServiceImpl taskService;
-
-    public TaskController(TaskServiceImpl taskService) {
-        this.taskService = taskService;
-    }
+	private final ITaskService taskService;
 
     /**
 	 * will return uncompleted tasks for given user
@@ -26,8 +23,14 @@ public class TaskController {
 	 * @return list uncompleted tasks for the user
 	 */
 	@GetMapping("/uncompleted-tasks/{user}")
-	public ResponseEntity<Task[]> getUncompletedTasks(@PathVariable ("user") String user, @RequestParam(name = "type",required = false) String type){
+	public ResponseEntity<Task[]> getUncompletedTasks(@PathVariable ("user") String user,
+													  @RequestParam(name = "type",required = false) String type){
 		return taskService.getUncompletedTasks(user, type);
+	}
+
+	@GetMapping("/completed-tasks/{user}")
+	public ResponseEntity<Task[]> getCompletedTasks(@PathVariable ("user") String user){
+		return taskService.getCompletedTasks(user);
 	}
 
 	/**
