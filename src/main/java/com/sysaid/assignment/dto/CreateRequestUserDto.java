@@ -11,6 +11,6 @@ import lombok.Setter;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class GetRequestTaskDto {
-    private String key;
+public class CreateRequestUserDto {
+    private String username;
 }

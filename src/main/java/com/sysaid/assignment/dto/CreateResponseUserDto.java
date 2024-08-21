@@ -9,8 +9,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
-public class GetRequestTaskDto {
-    private String key;
+@AllArgsConstructor
+public class CreateResponseUserDto {
+    private String username;
 }

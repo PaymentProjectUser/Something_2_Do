@@ -27,5 +27,6 @@ public class Task implements Serializable {
 	private String link;
 	@EqualsAndHashCode.Include
 	private String key;
+	private int rating;
 }
 

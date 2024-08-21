@@ -16,4 +16,5 @@ public class DeleteResponseTaskDto {
     private String link;
     private String key;
     private String username;
+    private int rating;
 }

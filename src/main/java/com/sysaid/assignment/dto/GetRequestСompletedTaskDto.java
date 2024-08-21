@@ -15,4 +15,5 @@ public class GetRequestСompletedTaskDto {
     private Float price;
     private String link;
     private String key;
+    private int rating;
 }

@@ -45,7 +45,7 @@ public class TaskServiceImpl implements ITaskService {
         ResponseEntity<Task> responseEntity = template.getForEntity(endpointUrl, Task.class);
 
         return ResponseEntity.ok(taskMapper.taskToCreateTaskDto(
-                ITaskRepository.createTask(responseEntity.getBody(), null)));
+                ITaskRepository.createTask(responseEntity.getBody())));
     }
 
     @Override
@@ -55,19 +55,27 @@ public class TaskServiceImpl implements ITaskService {
     }
 
     @Override
-    public ResponseEntity<GetRequestUserWishListTaskDto[]> addTaskToUserWishList(AddRequestTaskToUserWishListDto addRequestTaskToUserWishListDto) {
+    public ResponseEntity<AddResponseTaskToUserWishListDto[]> addTaskToUserWishList(AddRequestTaskToUserWishListDto addRequestTaskToUserWishListDto) {
         return ResponseEntity.ok(
                 ITaskRepository.addTaskToUserWishList(addRequestTaskToUserWishListDto.getUsername(),
                 addRequestTaskToUserWishListDto.getExistTaskDto()).stream()
-                        .map(taskMapper::taskToGetRequestUserWishListTaskDto)
-                        .toArray(GetRequestUserWishListTaskDto[]::new)
+                        .map(taskMapper::taskToAddResponseTaskToUserWishListDto)
+                        .toArray(AddResponseTaskToUserWishListDto[]::new)
                 );
     }
 
     @Override
+    public ResponseEntity<GetResponseTasksByRating[]> getTasksByRating(Integer rating) {
+        return ResponseEntity.ok(
+                ITaskRepository.getTasksByRating(rating).stream()
+                        .map(taskMapper::taskToGetResponseTasksByRating)
+                        .toArray(GetResponseTasksByRating[]::new)
+        );
+    }
+
+    @Override
     public ResponseEntity<CreateResponseTaskDto> createTask(CreateRequestTaskDto createRequestTaskDto) {
-        Task createdTask = ITaskRepository.createTask(taskMapper.mapCreateRequestTaskDtoToTask(createRequestTaskDto),
-                createRequestTaskDto.getUsername());
+        Task createdTask = ITaskRepository.createTask(taskMapper.mapCreateRequestTaskDtoToTask(createRequestTaskDto));
 
         return ResponseEntity.ok(taskMapper.taskToCreateTaskDto(createdTask));
     }
@@ -92,11 +100,11 @@ public class TaskServiceImpl implements ITaskService {
     }
 
     @Override
-    public ResponseEntity<GetRequestUserWishListTaskDto[]> getUserWishList(String username) {
+    public ResponseEntity<GetResponseUserWishListTaskDto[]> getUserWishList(String username) {
         return ResponseEntity.ok(
                 ITaskRepository.getUserWishList(username).stream()
                         .map(taskMapper::taskToGetRequestUserWishListTaskDto)
-                        .toArray(GetRequestUserWishListTaskDto[]::new)
+                        .toArray(GetResponseUserWishListTaskDto[]::new)
         );
     }
 }

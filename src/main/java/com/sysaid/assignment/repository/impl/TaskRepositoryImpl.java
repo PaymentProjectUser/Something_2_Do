@@ -9,20 +9,20 @@ import com.sysaid.assignment.exception.WrongTaskTypeException;
 import com.sysaid.assignment.mapper.TaskMapper;
 import com.sysaid.assignment.repository.ITaskRepository;
 import com.sysaid.assignment.storage.TaskStorage;
+import com.sysaid.assignment.storage.TaskUsersStorage;
 import com.sysaid.assignment.storage.UserStorage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Component //TODO change to @Repository after connect DB
 public class TaskRepositoryImpl implements ITaskRepository {
-    private final Map<Task, UserData> taskMap = TaskStorage.getInstance().getTaskMap();
+    private final Map<Task, UserData> taskUserDataMap = TaskUsersStorage.getInstance().getTaskMap();
     private final Set<UserData> userList = UserStorage.getInstance().getUserList();
+    private final Set<Task> taskList = TaskStorage.getInstance().getTaskSet();
     private final TaskMapper taskMapper;
 
     @Override
@@ -34,11 +34,12 @@ public class TaskRepositoryImpl implements ITaskRepository {
             throw new WrongTaskTypeException("The type cannot be complete!");
         }
 
-        return taskMap.entrySet().stream()
+        return taskUserDataMap.entrySet().stream()
                 .filter(entry -> (type == null && !entry.getKey().getType().equals("complete"))
                         || entry.getKey().getType().equals(type))
                 .filter(entry -> entry.getValue().getUsername().equals(user))
                 .map(Map.Entry::getKey)
+                .limit(10)
                 .collect(Collectors.toList());
     }
 
@@ -48,7 +49,7 @@ public class TaskRepositoryImpl implements ITaskRepository {
             throw new UserNotFoundException("An empty login user was received!");
         }
 
-        return taskMap.keySet().stream()
+        return taskUserDataMap.keySet().stream()
                 .filter(userData -> userData.getType().equals("complete"))
                 .collect(Collectors.toList());
     }
@@ -61,8 +62,9 @@ public class TaskRepositoryImpl implements ITaskRepository {
         }
 
         Task task = findTask(existTaskDto.getTaskKey());
+        task.setRating(task.getRating() + 1);
 
-        taskMap.put(task, user);
+        taskUserDataMap.put(task, user);
         return getUserWishList(username);
     }
 
@@ -73,22 +75,43 @@ public class TaskRepositoryImpl implements ITaskRepository {
             throw new UserNotFoundException("User not found!");
         }
 
-        return taskMap.entrySet().stream()
+        return taskUserDataMap.entrySet().stream()
                 .filter(entry -> entry.getValue().equals(user))
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public Task createTask(Task task, String username) {
-        UserData userData = null;
-        if (username != null) {
-            userData = findUser(username);
-            if (userData != null) {
-                userData.setTaskQuantity(userData.getTaskQuantity() + 1);
-            }
+    public List<Task> getTasksByRating(Integer rating) {
+        if (rating != null) {
+            return taskList.stream()
+                    .filter(item -> item.getRating() == rating)
+                    .collect(Collectors.toList());
         }
-        taskMap.put(task, userData);
+        List<Task> sortedTasks = taskList.stream()
+                .sorted(Comparator.comparingInt(Task::getRating).reversed())
+                .collect(Collectors.toList());
+
+        List<Task> selectedTasks = new ArrayList<>();
+
+        selectedTasks.addAll(selectTopNPercent(sortedTasks, 20, 0)); //TODO move all magic numbers and hardcode to the constants class
+
+        selectedTasks.addAll(selectTopNPercent(sortedTasks, 20, 20));
+
+        selectedTasks.addAll(selectTopNPercent(sortedTasks, 10, 40));
+
+        selectedTasks.addAll(selectTopNPercent(sortedTasks, 5, 50));
+
+        selectedTasks.addAll(selectTopNPercent(sortedTasks, 5, 55));
+
+        selectedTasks.addAll(selectRandomNPercent(taskList, 40));
+
+        return selectedTasks;
+    }
+
+    @Override
+    public Task createTask(Task task) {
+        taskList.add(task);
 
         return task;
     }
@@ -96,9 +119,12 @@ public class TaskRepositoryImpl implements ITaskRepository {
     @Override
     public Task updateTask(Task updatedTask, String taskKey) {
         Task oldTask = findTask(taskKey);
-        taskMap.put(updatedTask, taskMap.get(oldTask));
 
-        taskMap.remove(oldTask);
+        taskUserDataMap.put(updatedTask, taskUserDataMap.get(oldTask));
+        taskList.add(updatedTask);
+
+        taskUserDataMap.remove(oldTask);
+        taskList.remove(oldTask);
 
         return updatedTask;
     }
@@ -116,7 +142,9 @@ public class TaskRepositoryImpl implements ITaskRepository {
 
         Task taskToDelete = findTask(keyToFind);
 
-        taskMap.remove(taskToDelete);
+        taskUserDataMap.remove(taskToDelete);
+        taskList.remove(taskToDelete);
+
         return taskToDelete;
     }
 
@@ -127,14 +155,13 @@ public class TaskRepositoryImpl implements ITaskRepository {
         Task taskToComplete = findTask(keyToFind);
         taskToComplete.setType("complete");
 
-        UserData userData = taskMap.get(taskToComplete);
-        userData.setTaskQuantity(userData.getTaskQuantity() - 1);
+        taskToComplete.setRating(taskToComplete.getRating() + 2);
 
         return taskToComplete;
     }
 
     private Task findTask(String taskKey) {
-        return taskMap.keySet().stream()
+        return taskList.stream()
                 .filter(task -> task.getKey().equals(taskKey))
                 .findFirst()
                 .orElseThrow(() -> new TaskNotFoundException("Task not found with key: " + taskKey));
@@ -144,6 +171,28 @@ public class TaskRepositoryImpl implements ITaskRepository {
         return userList.stream()
                 .filter(item -> item.getUsername().equals(username))
                 .findFirst().orElse(null);
+    }
+
+    private List<Task> selectTopNPercent(List<Task> sortedTasks, int percent, int startIndex) {
+        int size = sortedTasks.size();
+        int numTasks = size * percent / 100;
+
+        return sortedTasks.stream()
+                .skip(startIndex)
+                .limit(numTasks)
+                .collect(Collectors.toList());
+    }
+
+    private List<Task> selectRandomNPercent(Set<Task> tasks, int percent) {
+        int size = tasks.size();
+        int numTasks = size * percent / 100;
+
+        List<Task> randomTasks = new ArrayList<>(tasks);
+        Collections.shuffle(randomTasks);
+
+        return randomTasks.stream()
+                .limit(numTasks)
+                .collect(Collectors.toList());
     }
 }
 

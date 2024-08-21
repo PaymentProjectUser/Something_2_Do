@@ -1,6 +1,5 @@
 package com.sysaid.assignment.service;
 
-import com.sysaid.assignment.domain.Task;
 import com.sysaid.assignment.dto.*;
 import org.springframework.http.ResponseEntity;
 
@@ -19,9 +18,11 @@ public interface ITaskService {
 
     ResponseEntity<DeleteResponseTaskDto> deleteTask(DeleteRequestTaskDto deleteRequestTaskDto);
 
-    ResponseEntity<GetRequestUserWishListTaskDto[]> getUserWishList(String username);
+    ResponseEntity<GetResponseUserWishListTaskDto[]> getUserWishList(String username);
 
     ResponseEntity<CompleteResponseTaskDto> completeTask(CompleteRequestTaskDto completeRequestTaskDto);
 
-    ResponseEntity<GetRequestUserWishListTaskDto[]> addTaskToUserWishList(AddRequestTaskToUserWishListDto addRequestTaskToUserWishListDto);
+    ResponseEntity<AddResponseTaskToUserWishListDto[]> addTaskToUserWishList(AddRequestTaskToUserWishListDto addRequestTaskToUserWishListDto);
+
+    ResponseEntity<GetResponseTasksByRating[]> getTasksByRating(Integer rating);
 }

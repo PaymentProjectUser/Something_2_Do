@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class UpdateResponseTaskDto {
+public class GetResponseTasksByRating {
     private String activity;
     private Float accessibility;
     private String type;

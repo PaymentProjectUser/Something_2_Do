@@ -1,9 +1,12 @@
 package com.sysaid.assignment.storage;
 
 import com.sysaid.assignment.domain.UserData;
+import lombok.Getter;
+
 import java.util.HashSet;
 import java.util.Set;
 
+@Getter
 public class UserStorage {
     private static UserStorage instance;
 
@@ -18,9 +21,5 @@ public class UserStorage {
             instance = new UserStorage();
         }
         return instance;
-    }
-
-    public Set<UserData> getUserList() {
-        return userList;
     }
 }

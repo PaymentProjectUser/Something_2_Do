@@ -15,4 +15,5 @@ public class GetRequestUncompletedTaskDto {
     private Float price;
     private String link;
     private String key;
+    private int rating;
 }

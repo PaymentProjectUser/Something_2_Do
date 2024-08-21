@@ -11,7 +11,7 @@ public interface ITaskRepository {
 
     Task completeTask(CompleteRequestTaskDto completeRequestTaskDto);
 
-    Task createTask(Task task, String username);
+    Task createTask(Task task);
 
     Task updateTask(Task updatedTask, String taskKey);
 
@@ -24,4 +24,6 @@ public interface ITaskRepository {
     List<Task> addTaskToUserWishList(String username, ExistTaskDto existTaskDto);
 
     List<Task> getUserWishList(String username);
+
+    List<Task> getTasksByRating(Integer rating);
 }

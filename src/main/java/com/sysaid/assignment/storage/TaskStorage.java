@@ -1,18 +1,19 @@
 package com.sysaid.assignment.storage;
 
 import com.sysaid.assignment.domain.Task;
-import com.sysaid.assignment.domain.UserData;
+import lombok.Getter;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 
+@Getter
 public class TaskStorage {
     private static TaskStorage instance;
 
-    private final Map<Task, UserData> taskMap;
+    private final Set<Task> taskSet;
 
     private TaskStorage() {
-        taskMap = new HashMap<>();
+        taskSet = new HashSet<>();
     }
 
     public static synchronized TaskStorage getInstance() {
@@ -20,9 +21,5 @@ public class TaskStorage {
             instance = new TaskStorage();
         }
         return instance;
-    }
-
-    public Map<Task, UserData> getTaskMap() {
-        return taskMap;
     }
 }

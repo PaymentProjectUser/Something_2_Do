@@ -13,5 +13,4 @@ import lombok.Setter;
 @AllArgsConstructor
 public class UserData {
     private String username;
-    private int taskQuantity;
 }
